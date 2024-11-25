@@ -9,9 +9,6 @@ import {
 	Box,
 } from "@mui/material";
 
-// Generate unique IDs
-const generateUniqueId = () => `order_${Math.floor(Math.random() * 100000)}`;
-
 const products = [
 	{ id: 1, name: "Laptop", price: 1199.99 },
 	{ id: 2, name: "Mouse", price: 24.99 },
@@ -24,10 +21,11 @@ const products = [
 const paymentMethods = ["Credit Card", "PayPal", "Bank Transfer"];
 
 function App() {
+	//States:
 	const [selectedProduct, setSelectedProduct] = useState(products[0]);
 	const [selectedPayment, setSelectedPayment] = useState(paymentMethods[0]);
-	const [order, setOrder] = useState({
-		id: generateUniqueId(),
+	const [transaction, setTransaction] = useState({
+		id: crypto.randomUUID(),
 		type: "PURCHASE",
 		date: new Date().toISOString(),
 		paymentType: selectedPayment,
@@ -36,10 +34,10 @@ function App() {
 		amount: selectedProduct.price,
 	});
 
-	// POST request to dummy REST API endpoint
-	const handlePostOrder = (type) => {
-		const newOrder = {
-			id: generateUniqueId(),
+	// Functions
+	const handlePostTransaction = (type) => {
+		const newTransaction = {
+			id: crypto.randomUUID(),
 			type,
 			date: new Date().toISOString(),
 			paymentType: selectedPayment,
@@ -48,16 +46,16 @@ function App() {
 			amount: selectedProduct.price,
 		};
 
-		setOrder(newOrder);
+		setTransaction(newTransaction);
 
-		console.log(newOrder);
+		console.log(newTransaction);
 
-		fetch("https://dummyapi.com/orders", {
+		fetch("https://insertActualApiEndpointHere.com/transactions", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify(newOrder),
+			body: JSON.stringify(newTransaction),
 		})
 			.then((response) => {
 				if (!response.ok) {
@@ -69,6 +67,7 @@ function App() {
 			.catch((error) => console.error("Error posting order:", error));
 	};
 
+	//Rendering
 	return (
 		<Box sx={{ p: 3, maxWidth: "600px", margin: "0 auto" }}>
 			<Typography variant="h4" gutterBottom>
@@ -110,9 +109,9 @@ function App() {
 				))}
 			</RadioGroup>
 
-			{/* Order Summary */}
+			{/* Transaction Summary */}
 			<Typography variant="h6" sx={{ mt: 3 }}>
-				Your Order: {selectedProduct.name} (${selectedProduct.price})
+				Your Transaction: {selectedProduct.name} (${selectedProduct.price})
 			</Typography>
 
 			{/* Purchase and Return Buttons */}
@@ -120,14 +119,14 @@ function App() {
 				<Button
 					variant="contained"
 					color="primary"
-					onClick={() => handlePostOrder("PURCHASE")}
+					onClick={() => handlePostTransaction("PURCHASE")}
 				>
 					Purchase
 				</Button>
 				<Button
 					variant="outlined"
 					color="secondary"
-					onClick={() => handlePostOrder("REFUND")}
+					onClick={() => handlePostTransaction("REFUND")}
 				>
 					Return
 				</Button>
